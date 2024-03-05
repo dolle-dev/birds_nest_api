@@ -73,6 +73,7 @@ class Node < ApplicationRecord
   def cache_ancestors_on_create
     self.ancestors_cache = [self.id]
     self.ancestors_cache << self.parent_id if parent_id
+    save
   end
 
   def update_descendants_cache
