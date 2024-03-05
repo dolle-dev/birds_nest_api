@@ -35,7 +35,7 @@ RSpec.describe Node, type: :model do
     context "when one node is an ancestor of the other" do
       it "returns the ancestor node" do
         root_id, lca_id, depth = Node.lowest_common_ancestor(child1.id, grandchild.id)
-        expect([root_id, lca_id, depth]).to eq([child1.id, child1.id, 1])
+        expect([root_id, lca_id, depth]).to eq([root.id, child1.id, 2])
       end
     end
 

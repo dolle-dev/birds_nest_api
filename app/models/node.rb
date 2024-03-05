@@ -17,7 +17,7 @@ class Node < ApplicationRecord
       
       return [nil, nil, nil] unless node1 && node2
 
-      calculate_common_ancestors(node1.ancestors_cache, node2.ancestors_cache)
+      calculate_common_ancestors(node1.ancestors_cache.unshift(node1.id), node2.ancestors_cache.unshift(node2.id))
     end
 
     def birds_for_nodes(node_ids)
@@ -42,7 +42,8 @@ class Node < ApplicationRecord
   class << self
     def handle_identical_node_ids(node_id)
       node = find_by(id: node_id)
-      node ? [node.ancestors_cache.last, node.id, node.ancestors_cache.length] : [nil, nil, nil]
+      root = node.ancestors_cache.last || node
+      node ? [root.id, node.id, node.ancestors_cache.length + 1] : [nil, nil, nil]
     end
 
     def find_nodes_by_ids(node1_id, node2_id)
@@ -59,7 +60,7 @@ class Node < ApplicationRecord
   end
 
   def cache_ancestors(visited_nodes = {})
-    self.ancestors_cache = [self.id]
+    self.ancestors_cache = []
     visited_nodes[self.id] = true
     current_node = self.parent
 
@@ -71,9 +72,7 @@ class Node < ApplicationRecord
   end
 
   def cache_ancestors_on_create
-    self.ancestors_cache = [self.id]
-    self.ancestors_cache << self.parent_id if parent_id
-    save
+    update_ancestors_cache
   end
 
   def update_descendants_cache
